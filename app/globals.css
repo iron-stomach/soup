@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* ────────────────────────────────────────────────────────────
+   Design System CSS Variables (Tailwind CSS v4 Theme)
+   ──────────────────────────────────────────────────────────── */
+
+@theme {
+  /* Colors - Brand */
+  --color-brand: #3B82F6;
+  --color-brand-hover: #2563EB;
+  --color-brand-active: #1D4ED8;
+  --color-brand-subtle: #EFF6FF;
+
+  /* Colors - Text */
+  --color-text-primary: #0A0A0A;
+  --color-text-secondary: #525252;
+  --color-text-tertiary: #737373;
+  --color-text-disabled: #ABABAB;
+  --color-text-inverse: #FFFFFF;
+
+  /* Colors - Background */
+  --color-bg-default: #FFFFFF;
+  --color-bg-subtle: #F9F9F9;
+  --color-bg-muted: #F3F3F3;
+
+  /* Colors - Border */
+  --color-border-default: #E8E8E8;
+  --color-border-strong: #D4D4D4;
+  --color-border-focus: #3B82F6;
+
+  /* Colors - Status */
+  --color-success: #22C55E;
+  --color-success-subtle: #F0FDF4;
+  --color-warning: #EAB308;
+  --color-warning-subtle: #FEFCE8;
+  --color-error: #F43F5E;
+  --color-error-subtle: #FFF1F2;
+  --color-info: #3B82F6;
+  --color-info-subtle: #EFF6FF;
+
+  /* Typography */
+  --font-sans: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Shadows */
+  --shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.4);
+  --shadow-focus-error: 0 0 0 3px rgba(244, 63, 94, 0.4);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
