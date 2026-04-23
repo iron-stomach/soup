@@ -1,6 +1,6 @@
 {
-  "buildCommand": "storybook build",
   "outputDirectory": "storybook-static",
-  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "echo done",
+  "installCommand": "echo done",
   "framework": null
 }
