@@ -1,5 +1,12 @@
 {
-  "buildCommand": "npx storybook build",
-  "outputDirectory": "storybook-static",
-  "framework": null
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "storybook-static"
+      }
+    }
+  ]
 }
