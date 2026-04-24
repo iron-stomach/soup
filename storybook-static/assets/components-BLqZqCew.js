@@ -1,1 +1,0 @@
-import{y as e}from"./components-Cv4MBGlU.js";export{e as createCopyToClipboardFunction};
