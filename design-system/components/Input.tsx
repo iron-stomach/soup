@@ -1,155 +1,230 @@
 import React from 'react';
+import { PlusIcon } from '../icons';
+
+// ─── Inline icons ─────────────────────────────────────────────────────────────
+
+const ArrowRightIcon = ({ size = 20, color = 'currentColor' }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden>
+    <path
+      d="M4.167 10h11.666M10 4.167 15.833 10 10 15.833"
+      stroke={color}
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const DisabledIcon = () => (
+  <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
+    <rect x="2.5" y="2.5" width="11" height="11" rx="2.5" fill="rgba(174,176,182,0.5)" />
+  </svg>
+);
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type InputSize = 'sm' | 'md' | 'lg';
-type InputVariant = 'outline' | 'filled' | 'flushed';
+type PromptState = 'disable' | 'default' | 'enable';
+type PromptLayout = 'expanded' | 'compact';
 
-interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  label?: string;
-  helperText?: string;
-  errorMessage?: string;
-  isInvalid?: boolean;
-  isDisabled?: boolean;
-  isRequired?: boolean;
-  size?: InputSize;
-  variant?: InputVariant;
-  leftAddon?: React.ReactNode;
-  rightAddon?: React.ReactNode;
-  leftElement?: React.ReactNode;
-  rightElement?: React.ReactNode;
+interface InputProps {
+  /** 인풋 상태 */
+  state?: PromptState;
+  /** 레이아웃 타입 */
+  layout?: PromptLayout;
+  value?: string;
+  placeholder?: string;
+  onChange?: (value: string) => void;
+  onSubmit?: () => void;
+  onAttach?: () => void;
+  className?: string;
 }
 
-// ─── Style Maps ──────────────────────────────────────────────────────────────
+// ─── Border / background helpers ─────────────────────────────────────────────
 
-const sizeStyles: Record<InputSize, string> = {
-  sm: 'h-8 text-sm px-3',
-  md: 'h-10 text-sm px-3',
-  lg: 'h-11 text-base px-4',
-};
+function getContainerStyle(state: PromptState, layout: PromptLayout): React.CSSProperties {
+  const borderRadius = layout === 'expanded' ? 16 : 12;
 
-const variantStyles: Record<InputVariant, { base: string; error: string }> = {
-  outline: {
-    base: 'border border-gray-300 rounded-md bg-white hover:border-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
-    error: 'border-rose-500 hover:border-rose-500 focus:border-rose-500 focus:ring-rose-500/20',
-  },
-  filled: {
-    base: 'border border-transparent rounded-md bg-gray-100 hover:bg-gray-200 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20',
-    error: 'border-rose-500 bg-rose-50 hover:bg-rose-50 focus:bg-white focus:border-rose-500 focus:ring-rose-500/20',
-  },
-  flushed: {
-    base: 'border-0 border-b border-gray-300 rounded-none px-0 hover:border-gray-400 focus:border-blue-500 focus:ring-0 focus:ring-offset-0',
-    error: 'border-rose-500 hover:border-rose-500 focus:border-rose-500',
-  },
-};
+  if (state === 'disable') {
+    return {
+      border: '1px solid rgba(112, 115, 124, 0.32)',
+      backgroundColor: '#1c1c1c',
+      borderRadius,
+    };
+  }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+  if (state === 'enable') {
+    return {
+      border: '1px solid transparent',
+      backgroundImage:
+        'linear-gradient(#1b1c1e, #1b1c1e), linear-gradient(91deg, #2E8DD5 -0.72%, #2A9060 29.36%, #E0942D 59.43%, #E7664B 84.49%, #CF295D 99.52%)',
+      backgroundOrigin: 'padding-box, border-box' as React.CSSProperties['backgroundOrigin'],
+      backgroundClip: 'padding-box, border-box' as React.CSSProperties['backgroundClip'],
+      borderRadius,
+    };
+  }
+
+  // default: gradient border using background-clip technique
+  return {
+    border: '1px solid transparent',
+    backgroundImage:
+      'linear-gradient(#1b1c1e, #1b1c1e), linear-gradient(91deg, #2E8DD5 -0.72%, #2A9060 29.36%, #E0942D 59.43%, #E7664B 84.49%, #CF295D 99.52%)',
+    backgroundOrigin: 'padding-box, border-box' as React.CSSProperties['backgroundOrigin'],
+    backgroundClip: 'padding-box, border-box' as React.CSSProperties['backgroundClip'],
+    borderRadius,
+  };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function Input({
-  label,
-  helperText,
-  errorMessage,
-  isInvalid = false,
-  isDisabled = false,
-  isRequired = false,
-  size = 'md',
-  variant = 'outline',
-  leftAddon,
-  rightAddon,
-  leftElement,
-  rightElement,
-  id,
+  state = 'default',
+  layout = 'expanded',
+  value = '',
+  placeholder = '무엇이든 물어보고 만들어보세요',
+  onChange,
+  onSubmit,
+  onAttach,
   className = '',
-  ...props
 }: InputProps) {
-  const inputId = id || `input-${Math.random().toString(36).slice(2, 7)}`;
-  const hasError = isInvalid || Boolean(errorMessage);
-  const styles = variantStyles[variant];
+  const isExpanded = layout === 'expanded';
+  const isDisable = state === 'disable';
+  const isEnable = state === 'enable';
 
-  const inputClasses = [
-    'w-full outline-none transition-colors duration-150',
-    'placeholder:text-gray-400',
-    'disabled:opacity-50 disabled:cursor-not-allowed',
-    sizeStyles[size],
-    hasError ? styles.error : styles.base,
-    leftElement && 'pl-9',
-    rightElement && 'pr-9',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const containerStyle: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: isExpanded ? 'column' : 'row',
+    alignItems: isExpanded ? 'flex-start' : 'center',
+    gap: 12,
+    paddingTop: isExpanded ? 16 : 12,
+    paddingBottom: 12,
+    paddingLeft: 16,
+    paddingRight: 16,
+    boxSizing: 'border-box',
+    maxWidth: isExpanded ? 780 : 360,
+    minWidth: isExpanded ? 343 : 280,
+    ...getContainerStyle(state, layout),
+  };
+
+  const textStyle: React.CSSProperties = {
+    fontFamily: 'Pretendard Variable, Pretendard, sans-serif',
+    fontSize: 16,
+    fontWeight: 400,
+    lineHeight: 1.5,
+    color: isEnable ? '#f7f7f8' : 'rgba(174, 176, 182, 0.61)',
+    background: 'transparent',
+    border: 'none',
+    outline: 'none',
+    width: '100%',
+    padding: 0,
+    caretColor: '#f7f7f8',
+  };
+
+  const sendBtnStyle: React.CSSProperties = {
+    width: 32,
+    height: 32,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    flexShrink: 0,
+    border: 'none',
+    cursor: isDisable ? 'not-allowed' : 'pointer',
+    padding: 0,
+    backgroundColor: isEnable
+      ? '#005CE6'
+      : isDisable
+      ? 'rgba(174,176,182,0.28)'
+      : '#333438',
+  };
+
+  const plusBtnStyle: React.CSSProperties = {
+    width: 32,
+    height: 32,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    border: '1px solid rgba(112, 115, 124, 0.32)',
+    cursor: isDisable ? 'not-allowed' : 'pointer',
+    flexShrink: 0,
+    background: 'transparent',
+    padding: 0,
+  };
+
+  const iconColor = isDisable ? 'rgba(174,176,182,0.4)' : '#f7f7f8';
+
+  // Shared send / disabled button
+  const ActionButton = () => (
+    <button
+      style={sendBtnStyle}
+      disabled={isDisable}
+      onClick={!isDisable ? onSubmit : undefined}
+      aria-label={isDisable ? '전송 불가' : '전송'}
+      className="transition-all duration-150 hover:brightness-110 disabled:opacity-40"
+    >
+      {isDisable ? <DisabledIcon /> : <ArrowRightIcon size={20} color="#f7f7f8" />}
+    </button>
+  );
 
   return (
-    <div className="flex flex-col gap-1">
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="text-sm font-medium text-gray-700"
-        >
-          {label}
-          {isRequired && (
-            <span className="ml-1 text-rose-500" aria-hidden="true">*</span>
-          )}
-        </label>
-      )}
-
-      <div className="flex">
-        {/* Left Addon */}
-        {leftAddon && (
-          <div className="flex items-center px-3 border border-r-0 border-gray-300 rounded-l-md bg-gray-50 text-sm text-gray-500">
-            {leftAddon}
-          </div>
-        )}
-
-        {/* Input Wrapper */}
-        <div className="relative flex-1">
-          {leftElement && (
-            <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-              {leftElement}
-            </div>
-          )}
-          <input
-            id={inputId}
-            disabled={isDisabled}
-            aria-invalid={hasError}
-            aria-describedby={
-              [
-                helperText && `${inputId}-helper`,
-                (hasError && errorMessage) && `${inputId}-error`,
-              ].filter(Boolean).join(' ') || undefined
-            }
-            aria-required={isRequired}
-            className={inputClasses}
-            {...props}
+    <div style={containerStyle} className={className}>
+      {/* Text area */}
+      <div style={{ flex: 1, width: '100%', overflow: 'hidden', minHeight: 28 }}>
+        {isExpanded ? (
+          <textarea
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => onChange?.(e.target.value)}
+            disabled={isDisable}
+            rows={1}
+            style={{ ...textStyle, resize: 'none', minHeight: 28, maxHeight: 192 }}
+            className="placeholder:text-[rgba(174,176,182,0.61)] focus:outline-none"
           />
-          {rightElement && (
-            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400">
-              {rightElement}
-            </div>
-          )}
-        </div>
-
-        {/* Right Addon */}
-        {rightAddon && (
-          <div className="flex items-center px-3 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-sm text-gray-500">
-            {rightAddon}
-          </div>
+        ) : (
+          <input
+            type="text"
+            value={value}
+            placeholder={placeholder}
+            onChange={(e) => onChange?.(e.target.value)}
+            disabled={isDisable}
+            style={textStyle}
+            className="placeholder:text-[rgba(174,176,182,0.61)] focus:outline-none"
+          />
         )}
       </div>
 
-      {/* Helper / Error */}
-      {helperText && !hasError && (
-        <p id={`${inputId}-helper`} className="text-xs text-gray-500">
-          {helperText}
-        </p>
-      )}
-      {hasError && errorMessage && (
-        <p id={`${inputId}-error`} className="text-xs text-rose-500" role="alert">
-          {errorMessage}
-        </p>
+      {/* Buttons */}
+      {isExpanded ? (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            height: 32,
+            flexShrink: 0,
+          }}
+        >
+          {/* Attach / Plus button */}
+          <button
+            style={plusBtnStyle}
+            onClick={!isDisable ? onAttach : undefined}
+            disabled={isDisable}
+            aria-label="파일 첨부"
+            className="transition-all duration-150 hover:brightness-110 disabled:opacity-40"
+          >
+            <PlusIcon size={20} color={iconColor} strokeWidth={1.5} />
+          </button>
+
+          {/* Send button */}
+          <ActionButton />
+        </div>
+      ) : (
+        /* Compact: send button only */
+        <ActionButton />
       )}
     </div>
   );
 }
 
-export type { InputProps, InputSize, InputVariant };
+export type { InputProps, PromptState, PromptLayout };

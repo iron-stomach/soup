@@ -76,14 +76,16 @@ export default function DesignSystemPage() {
         </Section>
 
         <Section title="Input">
-          <Grid cols={{ sm: 1, md: 2 }} gap={4}>
-            <Input label="이름" placeholder="홍길동" />
-            <Input label="이메일" placeholder="hello@example.com" helperText="업무용 이메일을 입력해주세요" />
-            <Input label="검색" placeholder="검색어" leftElement={<SearchIcon size={16} />} variant="filled" />
-            <Input label="비밀번호" type="password" placeholder="비밀번호" rightElement={<EyeIcon size={16} />} isRequired />
-            <Input label="URL" leftAddon="https://" placeholder="example.com" />
-            <Input label="오류 상태" placeholder="입력값" isInvalid errorMessage="올바른 값을 입력해주세요." />
-          </Grid>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <Input state="disable" layout="expanded" />
+            <Input state="default" layout="expanded" />
+            <Input state="enable" layout="expanded" value="무엇이든 물어보고 만들어보세요" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+              <Input state="disable" layout="compact" />
+              <Input state="default" layout="compact" />
+              <Input state="enable" layout="compact" value="무엇이든 물어보고 만들어보세요" />
+            </div>
+          </div>
         </Section>
 
         <Section title="Card">

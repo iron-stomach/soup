@@ -10,3 +10,6 @@ export * from './Card';
 export * from './Avatar';
 export * from './Alert';
 export * from './Skeleton';
+export * from './Tab';
+export * from './Chip';
+export * from './Tooltip';

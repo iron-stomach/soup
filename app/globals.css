@@ -28,6 +28,22 @@
   --color-border-strong: #D4D4D4;
   --color-border-focus: #3B82F6;
 
+  /* Colors - Primary (ONN AI Design System) */
+  --color-primary-400: #005CE6;
+  --color-primary-hover: #004FCC;
+  --color-primary-030: #EFF3F7;
+
+  /* Colors - Cool Neutral */
+  --color-cool-neutral-17: #212225;
+  --color-cool-neutral-30: #46474C;
+  --color-cool-neutral-60: #878A93;
+
+  /* Colors - Label */
+  --color-label-normal: #F7F7F8;
+  --color-label-weak: #DCDCDC;
+  --color-label-neutral: rgba(194, 196, 200, 0.88);
+  --color-label-alternative: rgba(174, 176, 182, 0.61);
+
   /* Colors - Status */
   --color-success: #22C55E;
   --color-success-subtle: #F0FDF4;

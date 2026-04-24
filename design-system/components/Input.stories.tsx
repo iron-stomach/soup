@@ -1,93 +1,174 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import React from 'react';
 import { Input } from './Input';
-import { SearchIcon, EyeIcon } from '../icons';
 
 const meta: Meta<typeof Input> = {
   title: 'Components/Input',
   component: Input,
   tags: ['autodocs'],
+  parameters: {
+    backgrounds: {
+      default: 'dark',
+      values: [{ name: 'dark', value: '#0f0f11' }],
+    },
+    layout: 'centered',
+  },
   argTypes: {
-    variant: {
+    state: {
       control: 'select',
-      options: ['outline', 'filled', 'flushed'],
+      options: ['disable', 'default', 'enable'],
+      description: '인풋 상태',
     },
-    size: {
+    layout: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
+      options: ['expanded', 'compact'],
+      description: '레이아웃 타입',
     },
-    isInvalid: { control: 'boolean' },
-    isDisabled: { control: 'boolean' },
-    isRequired: { control: 'boolean' },
+    placeholder: { control: 'text' },
+    value: { control: 'text' },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof Input>;
 
+// ─── Label helper ─────────────────────────────────────────────────────────────
+
+const sectionLabel: React.CSSProperties = {
+  fontFamily: 'Pretendard Variable, Pretendard, sans-serif',
+  fontSize: 11,
+  fontWeight: 500,
+  letterSpacing: '0.08em',
+  textTransform: 'uppercase',
+  color: 'rgba(255,255,255,0.3)',
+  marginBottom: 12,
+};
+
+// ─── Stories ─────────────────────────────────────────────────────────────────
+
 export const Default: Story = {
   args: {
-    label: '이름',
-    placeholder: '홍길동',
+    state: 'default',
+    layout: 'expanded',
+    placeholder: '무엇이든 물어보고 만들어보세요',
   },
 };
 
-export const Variants: Story = {
+export const AllVariants: Story = {
+  name: 'All Variants',
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <Input label="Outline" placeholder="기본 스타일" variant="outline" />
-      <Input label="Filled" placeholder="배경 채움 스타일" variant="filled" />
-      <Input label="Flushed" placeholder="밑줄 스타일" variant="flushed" />
+    <div
+      style={{
+        padding: 40,
+        display: 'flex',
+        gap: 48,
+        alignItems: 'flex-start',
+        minWidth: 900,
+      }}
+    >
+      {/* Expanded column */}
+      <div style={{ flex: 1 }}>
+        <p style={sectionLabel}>Expanded</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Input state="disable" layout="expanded" />
+          <Input state="default" layout="expanded" />
+          <Input state="enable" layout="expanded" value="무엇이든 물어보고 만들어보세요" />
+        </div>
+      </div>
+
+      {/* Compact column */}
+      <div style={{ flex: 1 }}>
+        <p style={sectionLabel}>Compact</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
+          <Input state="disable" layout="compact" />
+          <Input state="default" layout="compact" />
+          <Input state="enable" layout="compact" value="무엇이든 물어보고 만들어보세요" />
+        </div>
+      </div>
     </div>
   ),
 };
 
-export const WithHelperText: Story = {
-  args: {
-    label: '이메일',
-    placeholder: 'hello@example.com',
-    helperText: '업무용 이메일을 입력해주세요',
-  },
-};
-
-export const WithError: Story = {
-  args: {
-    label: '이메일',
-    placeholder: 'hello@example.com',
-    isInvalid: true,
-    errorMessage: '올바른 이메일 형식이 아닙니다.',
-  },
-};
-
-export const WithIcons: Story = {
+export const Expanded: Story = {
+  name: 'Expanded — All States',
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <Input label="검색" placeholder="검색어를 입력하세요" leftElement={<SearchIcon size={16} />} />
-      <Input label="비밀번호" type="password" placeholder="비밀번호" rightElement={<EyeIcon size={16} />} />
+    <div style={{ padding: 40, display: 'flex', flexDirection: 'column', gap: 16, minWidth: 820 }}>
+      <Input state="disable" layout="expanded" />
+      <Input state="default" layout="expanded" />
+      <Input state="enable" layout="expanded" value="무엇이든 물어보고 만들어보세요" />
     </div>
   ),
 };
 
-export const WithAddon: Story = {
+export const Compact: Story = {
+  name: 'Compact — All States',
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <Input label="웹사이트" leftAddon="https://" placeholder="example.com" />
-      <Input label="가격" rightAddon="원" placeholder="10,000" />
+    <div style={{ padding: 40, display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-start' }}>
+      <Input state="disable" layout="compact" />
+      <Input state="default" layout="compact" />
+      <Input state="enable" layout="compact" value="무엇이든 물어보고 만들어보세요" />
     </div>
   ),
 };
 
-export const Required: Story = {
-  args: {
-    label: '필수 입력',
-    placeholder: '필수 항목입니다',
-    isRequired: true,
+export const Interactive: Story = {
+  name: 'Interactive (Expanded)',
+  render: () => {
+    const Demo = () => {
+      const [value, setValue] = React.useState('');
+      const state = value.length > 0 ? 'enable' : 'default';
+
+      return (
+        <div style={{ padding: 40, minWidth: 820 }}>
+          <Input
+            state={state}
+            layout="expanded"
+            value={value}
+            onChange={setValue}
+            onSubmit={() => setValue('')}
+            onAttach={() => {}}
+          />
+        </div>
+      );
+    };
+    return <Demo />;
   },
 };
 
-export const Disabled: Story = {
+export const InteractiveCompact: Story = {
+  name: 'Interactive (Compact)',
+  render: () => {
+    const Demo = () => {
+      const [value, setValue] = React.useState('');
+      const state = value.length > 0 ? 'enable' : 'default';
+
+      return (
+        <div style={{ padding: 40 }}>
+          <Input
+            state={state}
+            layout="compact"
+            value={value}
+            onChange={setValue}
+            onSubmit={() => setValue('')}
+          />
+        </div>
+      );
+    };
+    return <Demo />;
+  },
+};
+
+export const Disable: Story = {
   args: {
-    label: '비활성화',
-    placeholder: '입력 불가',
-    isDisabled: true,
+    state: 'disable',
+    layout: 'expanded',
+  },
+};
+
+export const Enable: Story = {
+  args: {
+    state: 'enable',
+    layout: 'expanded',
+    value: '무엇이든 물어보고 만들어보세요',
   },
 };
