@@ -28,6 +28,6 @@
     "storybook": "^8.6.14",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vite": "^8.0.8"
+    "vite": "^6.4.2"
   }
 }
